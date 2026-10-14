@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AETHER 3D — Next-Gen WebGL 3D Design System & Agency Studio</title>
+    <meta name="description" content="Transform traditional web layouts into immersive WebGL experiences with AETHER 3D. High-performance, SEO-optimized, and responsive 3D design components.">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="AETHER 3D — Next-Gen WebGL 3D Design System">
+    <meta property="og:description" content="Immersive WebGL experiences and 3D studio configurator for modern web projects.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://praiseabu-cmyk.github.io/aether_3d/">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f4ff',
+                            100: '#e0e8ff',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            900: '#1e1b4b',
+                            accent: '#00f0ff'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #090a0f;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(18, 20, 29, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-panel-hover:hover {
+            background: rgba(26, 30, 46, 0.8);
+            border-color: rgba(0, 240, 255, 0.3);
+            box-shadow: 0 10px 30px -10px rgba(0, 240, 255, 0.15);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, #00f0ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .touch-pan-y {
+            touch-action: pan-y;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090a0f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f293d;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+        /* Focus indicators for accessibility */
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 2px solid #00f0ff;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body class="selection:bg-brand-500 selection:text-white">
+
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-brand-600 focus:text-white">
+        Skip to main content
+    </a>
+
+    <!-- TOP STATUS BAR -->
+    <div role="region" aria-label="System status" class="fixed top-0 left-0 right-0 z-50 bg-[#101520]/90 backdrop-blur-md border-b border-white/5 text-xs text-gray-400 py-2 px-4 flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+            <span class="flex items-center font-semibold text-white">
+                <i data-lucide="cpu" class="w-4 h-4 mr-1.5 text-cyan-400" aria-hidden="true"></i>
+                AETHER WebGL Engine v4.2
+            </span>
+            <span class="hidden md:inline-flex items-center text-green-400 bg-green-950/60 border border-green-800/40 px-2 py-0.5 rounded-full">
+                <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-ping mr-1.5" aria-hidden="true"></span>
+                WebGL 2.0 Hardware Accelerated
+            </span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <span class="hidden sm:inline-block">Optimized 60 FPS Render Target</span>
+            <a href="#studio" class="text-cyan-400 hover:text-white transition-colors font-medium flex items-center">
+                Launch 3D Configurator <i data-lucide="arrow-right" class="w-3 h-3 ml-1" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- MAIN NAVIGATION -->
+    <header class="fixed top-10 left-0 right-0 z-40 px-4 md:px-8 mt-2">
+        <nav class="max-w-7xl mx-auto glass-panel rounded-2xl px-6 py-4 flex items-center justify-between" aria-label="Main Navigation">
+            <a href="#" class="flex items-center space-x-2 focus:outline-none rounded-xl">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-cyan-400 flex items-center justify-center font-black text-white text-lg shadow-lg shadow-brand-500/20" aria-hidden="true">
+                    Æ
+                </div>
+                <span class="text-xl font-bold tracking-tight text-white">AETHER<span class="text-cyan-400">3D</span></span>
+            </a>
+
+            <!-- Desktop Links -->
+            <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-300">
+                <a href="#hero" class="hover:text-cyan-400 transition-colors">Overview</a>
+                <a href="#features" class="hover:text-cyan-400 transition-colors">Architecture</a>
+                <a href="#studio" class="hover:text-cyan-400 transition-colors">3D Studio</a>
+                <a href="#portfolio" class="hover:text-cyan-400 transition-colors">Showcase</a>
+                <a href="#performance" class="hover:text-cyan-400 transition-colors">Performance</a>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="hidden md:flex items-center space-x-4">
+                <a href="#contact" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-500 text-white font-semibold text-sm hover:opacity-90 transition-all shadow-lg shadow-brand-500/25 flex items-center">
+                    Request Custom Build <i data-lucide="sparkles" class="w-4 h-4 ml-2" aria-hidden="true"></i>
+                </a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-btn" aria-label="Toggle Navigation Menu" aria-expanded="false" class="md:hidden text-gray-300 hover:text-white p-2 rounded-xl">
+                <i data-lucide="menu" class="w-6 h-6" aria-hidden="true"></i>
+            </button>
+        </nav>
+
+        <!-- Mobile Drawer -->
+        <div id="mobile-menu" class="hidden md:hidden max-w-7xl mx-auto mt-2 glass-panel rounded-2xl p-6 space-y-4 text-center">
+            <a href="#hero" class="block text-gray-300 hover:text-cyan-400 py-2 font-medium">Overview</a>
+            <a href="#features" class="block text-gray-300 hover:text-cyan-400 py-2 font-medium">Architecture</a>
+            <a href="#studio" class="block text-gray-300 hover:text-cyan-400 py-2 font-medium">3D Studio</a>
+            <a href="#portfolio" class="block text-gray-300 hover:text-cyan-400 py-2 font-medium">Showcase</a>
+            <a href="#performance" class="block text-gray-300 hover:text-cyan-400 py-2 font-medium">Performance</a>
+            <a href="#contact" class="block w-full py-3 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-500 text-white font-semibold text-sm">Request Custom Build</a>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <!-- HERO SECTION WITH INTERACTIVE 3D CANVAS -->
+        <section id="hero" class="relative min-h-screen pt-32 pb-20 flex items-center justify-center overflow-hidden">
+            <!-- 3D WebGL Canvas Background -->
+            <div id="hero-canvas-container" class="absolute inset-0 z-0 touch-pan-y" aria-hidden="true"></div>
+
+            <!-- Content Overlay -->
+            <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pointer-events-none">
+                <div class="pointer-events-auto">
+                    <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-semibold bg-brand-500/10 border border-brand-500/30 text-cyan-300 mb-6 backdrop-blur-md">
+                        <i data-lucide="layers" class="w-3.5 h-3.5 mr-2" aria-hidden="true"></i> Next-Gen WebGL Design System & Gutenberg Block Architecture
+                    </span>
+                    
+                    <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 max-w-4xl mx-auto leading-tight">
+                        Bring Your Web Experiences into the <span class="text-gradient">3D Dimension</span>
+                    </h1>
+                    
+                    <p class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10 font-normal">
+                        Transform traditional web layouts into immersive, high-performance WebGL experiences. SEO-optimized and built for modern agencies.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <a href="#studio" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-500 text-white font-semibold text-base hover:shadow-xl hover:shadow-cyan-500/20 transition-all flex items-center justify-center">
+                            Explore 3D Studio <i data-lucide="box" class="w-5 h-5 ml-2" aria-hidden="true"></i>
+                        </a>
+                        <a href="#portfolio" class="w-full sm:w-auto px-8 py-4 rounded-xl glass-panel text-white font-semibold text-base hover:bg-white/10 transition-all flex items-center justify-center">
+                            View Live Demos <i data-lucide="eye" class="w-5 h-5 ml-2" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Stats Bar -->
+                <div class="pointer-events-auto mt-20 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                    <div class="glass-panel p-4 rounded-2xl">
+                        <div class="text-2xl sm:text-3xl font-bold text-white">60 FPS</div>
+                        <div class="text-xs text-gray-400 mt-1">Hardware Accelerated</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-2xl">
+                        <div class="text-2xl sm:text-3xl font-bold text-cyan-400">&lt; 0.9s</div>
+                        <div class="text-xs text-gray-400 mt-1">First Contentful Paint</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-2xl">
+                        <div class="text-2xl sm:text-3xl font-bold text-white">100%</div>
+                        <div class="text-xs text-gray-400 mt-1">Gutenberg & Elementor Ready</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-2xl">
+                        <div class="text-2xl sm:text-3xl font-bold text-cyan-400">99 / 100</div>
+                        <div class="text-xs text-gray-400 mt-1">Lighthouse Performance</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ARCHITECTURE & FEATURES MATRIX -->
+        <section id="features" class="py-24 relative z-10 border-t border-white/5 bg-black/40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Built for Modern CMS & Custom Stacks</h2>
+                    <p class="text-gray-400">Designed with modular architecture supporting headless integrations, custom Gutenberg blocks, and fluid component templates.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="glass-panel glass-panel-hover p-8 rounded-3xl transition-all duration-300">
+                        <div class="w-12 h-12 rounded-2xl bg-brand-500/20 text-cyan-400 flex items-center justify-center mb-6">
+                            <i data-lucide="layout-grid" class="w-6 h-6" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Custom Block Architecture</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            Modular viewports, canvas backgrounds, and interactive 3D models structured for seamless layout builders and theme customizers.
+                        </p>
+                    </div>
+
+                    <div class="glass-panel glass-panel-hover p-8 rounded-3xl transition-all duration-300">
+                        <div class="w-12 h-12 rounded-2xl bg-brand-500/20 text-cyan-400 flex items-center justify-center mb-6">
+                            <i data-lucide="zap" class="w-6 h-6" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Dynamic Asset Compression</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            Optimized Draco GLTF compression pipelines convert heavy 3D assets into lightweight web formats for instant site loading.
+                        </p>
+                    </div>
+
+                    <div class="glass-panel glass-panel-hover p-8 rounded-3xl transition-all duration-300">
+                        <div class="w-12 h-12 rounded-2xl bg-brand-500/20 text-cyan-400 flex items-center justify-center mb-6">
+                            <i data-lucide="mouse-pointer" class="w-6 h-6" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Scroll & Parallax Triggers</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            Link 3D camera animations directly to page scrolling, hover states, and touch gestures with effortless configuration.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTERACTIVE 3D CONFIGURATOR STUDIO -->
+        <section id="studio" class="py-24 relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-12">
+                    <span class="text-cyan-400 font-semibold text-sm tracking-wider uppercase">Live WebGL Playground</span>
+                    <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2 mb-4">Interactive 3D Studio Configurator</h2>
+                    <p class="text-gray-400">Test live shader materials, lighting setups, and geometries directly in this real-time WebGL viewport.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+                    <!-- Configurator Controls -->
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col justify-between space-y-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                                <i data-lucide="sliders" class="w-5 h-5 mr-2 text-cyan-400" aria-hidden="true"></i> Geometry & Style
+                            </h3>
+                            
+                            <!-- Geometry Selector -->
+                            <div class="mb-5">
+                                <label class="text-xs text-gray-400 block mb-2" id="geo-label">Select 3D Mesh Type</label>
+                                <div class="grid grid-cols-2 gap-2" role="group" aria-labelledby="geo-label">
+                                    <button onclick="changeGeometry('torus')" class="geo-btn active py-2.5 px-3 rounded-xl bg-brand-600 text-white text-xs font-semibold hover:bg-brand-500 transition-all">Torus Knot</button>
+                                    <button onclick="changeGeometry('sphere')" class="geo-btn py-2.5 px-3 rounded-xl bg-white/5 text-gray-300 text-xs font-semibold hover:bg-white/10 transition-all">Icosahedron</button>
+                                    <button onclick="changeGeometry('cube')" class="geo-btn py-2.5 px-3 rounded-xl bg-white/5 text-gray-300 text-xs font-semibold hover:bg-white/10 transition-all">Box Grid</button>
+                                    <button onclick="changeGeometry('dodeca')" class="geo-btn py-2.5 px-3 rounded-xl bg-white/5 text-gray-300 text-xs font-semibold hover:bg-white/10 transition-all">Dodecahedron</button>
+                                </div>
+                            </div>
+
+                            <!-- Material Shader -->
+                            <div class="mb-5">
+                                <label class="text-xs text-gray-400 block mb-2" id="mat-label">Material & Shader</label>
+                                <div class="grid grid-cols-2 gap-2" role="group" aria-labelledby="mat-label">
+                                    <button onclick="changeMaterial('glass')" class="mat-btn active py-2.5 px-3 rounded-xl bg-brand-600 text-white text-xs font-semibold hover:bg-brand-500 transition-all">Glassmorphism</button>
+                                    <button onclick="changeMaterial('wireframe')" class="mat-btn py-2.5 px-3 rounded-xl bg-white/5 text-gray-300 text-xs font-semibold hover:bg-white/10 transition-all">Wireframe</button>
+                                    <button onclick="changeMaterial('hologram')" class="mat-btn py-2.5 px-3 rounded-xl bg-white/5 text-gray-300 text-xs font-semibold hover:bg-white/10 transition-all">Holographic</button>
+                                    <button onclick="changeMaterial('metallic')" class="mat-btn py-2.5 px-3 rounded-xl bg-white/5 text-gray-300 text-xs font-semibold hover:bg-white/10 transition-all">Metallic Chrome</button>
+                                </div>
+                            </div>
+
+                            <!-- Color Palette Picker -->
+                            <div class="mb-5">
+                                <label class="text-xs text-gray-400 block mb-2" id="color-label">Accent Lighting Color</label>
+                                <div class="flex space-x-3" role="group" aria-labelledby="color-label">
+                                    <button onclick="setLightColor('#00f0ff')" aria-label="Cyan Light" class="w-8 h-8 rounded-full bg-[#00f0ff] ring-2 ring-white/20 hover:scale-110 transition-transform"></button>
+                                    <button onclick="setLightColor('#818cf8')" aria-label="Indigo Light" class="w-8 h-8 rounded-full bg-[#818cf8] ring-2 ring-white/20 hover:scale-110 transition-transform"></button>
+                                    <button onclick="setLightColor('#ec4899')" aria-label="Pink Light" class="w-8 h-8 rounded-full bg-[#ec4899] ring-2 ring-white/20 hover:scale-110 transition-transform"></button>
+                                    <button onclick="setLightColor('#10b981')" aria-label="Emerald Light" class="w-8 h-8 rounded-full bg-[#10b981] ring-2 ring-white/20 hover:scale-110 transition-transform"></button>
+                                </div>
+                            </div>
+
+                            <!-- Rotation Speed -->
+                            <div>
+                                <label for="speed-slider" class="text-xs text-gray-400 flex justify-between mb-2">
+                                    <span>Rotation Speed</span>
+                                    <span id="speed-val">1.5x</span>
+                                </label>
+                                <input type="range" id="speed-slider" min="0" max="5" step="0.1" value="1.5" class="w-full accent-cyan-400 bg-white/10 rounded-lg h-1.5 cursor-pointer">
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-white/10 flex justify-between items-center text-xs text-gray-400">
+                            <span>WebGL 2.0 Viewport</span>
+                            <span class="text-green-400 font-mono">Active Rendering</span>
+                        </div>
+                    </div>
+
+                    <!-- 3D Viewport Box -->
+                    <div class="lg:col-span-2 glass-panel rounded-3xl relative overflow-hidden min-h-[420px] flex items-center justify-center touch-pan-y">
+                        <div id="studio-canvas-container" class="absolute inset-0 w-full h-full" aria-label="3D Interactive Studio Canvas"></div>
+                        <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center pointer-events-none">
+                            <span class="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg text-xs text-gray-300 border border-white/10 pointer-events-auto">
+                                <i data-lucide="move" class="w-3.5 h-3.5 inline mr-1 text-cyan-400" aria-hidden="true"></i> Drag to rotate • Pinch/Scroll to zoom
+                            </span>
+                            <button onclick="resetStudioCamera()" class="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg text-xs text-cyan-400 hover:text-white border border-white/10 pointer-events-auto transition-colors">
+                                Reset Viewpoint
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PORTFOLIO SHOWCASE -->
+        <section id="portfolio" class="py-24 relative z-10 border-t border-white/5 bg-black/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-16">
+                    <div>
+                        <span class="text-cyan-400 font-semibold text-sm tracking-wider uppercase">Live Examples</span>
+                        <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">3D Component & Theme Showcase</h2>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Card 1 -->
+                    <div class="glass-panel glass-panel-hover rounded-3xl overflow-hidden group transition-all duration-300">
+                        <div class="h-52 bg-gradient-to-tr from-purple-900/60 to-indigo-900/60 relative overflow-hidden flex items-center justify-center">
+                            <i data-lucide="box" class="w-20 h-20 text-cyan-400/40 group-hover:scale-110 transition-transform duration-500" aria-hidden="true"></i>
+                            <span class="absolute top-4 right-4 bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs px-2.5 py-1 rounded-full font-semibold">WooCommerce 3D</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">CyberKart 3D Store</h3>
+                            <p class="text-gray-400 text-sm mb-4">Interactive 360-degree product previews integrated into e-commerce product pages.</p>
+                            <div class="flex items-center justify-between text-xs text-gray-400">
+                                <span>Elementor Compatible</span>
+                                <span class="text-cyan-400 flex items-center">Explore Demo <i data-lucide="external-link" class="w-3.5 h-3.5 ml-1" aria-hidden="true"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="glass-panel glass-panel-hover rounded-3xl overflow-hidden group transition-all duration-300">
+                        <div class="h-52 bg-gradient-to-tr from-cyan-900/60 to-blue-900/60 relative overflow-hidden flex items-center justify-center">
+                            <i data-lucide="globe" class="w-20 h-20 text-indigo-400/40 group-hover:scale-110 transition-transform duration-500" aria-hidden="true"></i>
+                            <span class="absolute top-4 right-4 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs px-2.5 py-1 rounded-full font-semibold">Corporate Theme</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">Nexus SaaS Portal</h3>
+                            <p class="text-gray-400 text-sm mb-4">Floating particle grid background with interactive camera scroll triggers for tech startups.</p>
+                            <div class="flex items-center justify-between text-xs text-gray-400">
+                                <span>Gutenberg Block</span>
+                                <span class="text-cyan-400 flex items-center">Explore Demo <i data-lucide="external-link" class="w-3.5 h-3.5 ml-1" aria-hidden="true"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="glass-panel glass-panel-hover rounded-3xl overflow-hidden group transition-all duration-300">
+                        <div class="h-52 bg-gradient-to-tr from-pink-900/60 to-purple-900/60 relative overflow-hidden flex items-center justify-center">
+                            <i data-lucide="sparkles" class="w-20 h-20 text-pink-400/40 group-hover:scale-110 transition-transform duration-500" aria-hidden="true"></i>
+                            <span class="absolute top-4 right-4 bg-pink-500/20 text-pink-300 border border-pink-500/30 text-xs px-2.5 py-1 rounded-full font-semibold">Creative Studio</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">Aetheria Folio</h3>
+                            <p class="text-gray-400 text-sm mb-4">Dynamic cursor-responsive fluid mesh canvas tailored for design agency portfolios.</p>
+                            <div class="flex items-center justify-between text-xs text-gray-400">
+                                <span>Full Site Editing</span>
+                                <span class="text-cyan-400 flex items-center">Explore Demo <i data-lucide="external-link" class="w-3.5 h-3.5 ml-1" aria-hidden="true"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PERFORMANCE BENCHMARK SECTION -->
+        <section id="performance" class="py-24 relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="glass-panel p-8 md:p-12 rounded-3xl border border-white/10 relative overflow-hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <div>
+                            <span class="text-cyan-400 font-semibold text-sm tracking-wider uppercase">Zero Overhead</span>
+                            <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2 mb-6">Blazing Fast WebGL Performance</h2>
+                            <p class="text-gray-300 mb-6 leading-relaxed">
+                                Traditional 3D web plugins slow down site speeds. AETHER 3D uses lazy WebGL canvas loading, dynamic LOD (Level of Detail), and GPU memory recycling to ensure maximum Lighthouse scores.
+                            </p>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between text-sm font-semibold mb-1">
+                                        <span class="text-gray-300">Google PageSpeed Mobile</span>
+                                        <span class="text-cyan-400">98 / 100</span>
+                                    </div>
+                                    <div class="w-full bg-white/10 rounded-full h-2">
+                                        <div class="bg-gradient-to-r from-brand-500 to-cyan-400 h-2 rounded-full w-[98%]"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-sm font-semibold mb-1">
+                                        <span class="text-gray-300">GPU Memory Footprint</span>
+                                        <span class="text-green-400">Optimized (12MB)</span>
+                                    </div>
+                                    <div class="w-full bg-white/10 rounded-full h-2">
+                                        <div class="bg-green-400 h-2 rounded-full w-[92%]"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-black/60 p-6 rounded-2xl border border-white/5 font-mono text-xs text-gray-300 space-y-3">
+                            <div class="flex items-center space-x-2 text-cyan-400 border-b border-white/10 pb-3">
+                                <i data-lucide="terminal" class="w-4 h-4" aria-hidden="true"></i>
+                                <span>Engine Diagnostic Telemetry</span>
+                            </div>
+                            <p class="text-green-400">[OK] WebGL Context Initialized (Hardware Accelerated)</p>
+                            <p>[INFO] Draco Decoder Loaded in 0.04s</p>
+                            <p>[INFO] 3D Mesh Compressed: 4.8MB -> 420KB</p>
+                            <p>[INFO] Active Frame Rate: 60 FPS Stable</p>
+                            <p class="text-cyan-300">[STATUS] Lighthouse LCP: 0.8s | CLS: 0.00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT & PROJECT INQUIRY SECTION -->
+        <section id="contact" class="py-24 relative z-10 border-t border-white/5 bg-black/50">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Request Custom 3D Theme Development</h2>
+                    <p class="text-gray-400">Have a custom project? Get in touch with our WebGL 3D design studio.</p>
+                </div>
+
+                <div class="glass-panel p-8 rounded-3xl">
+                    <!-- Formspree Endpoint Form. Replace 'YOUR_FORM_ID' with your actual Formspree form ID -->
+                    <form id="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label for="name" class="block text-xs font-semibold text-gray-300 mb-2">Your Name</label>
+                                <input type="text" id="name" name="name" required placeholder="John Doe" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-colors text-sm">
+                            </div>
+                            <div>
+                                <label for="email" class="block text-xs font-semibold text-gray-300 mb-2">Email Address</label>
+                                <input type="email" id="email" name="email" required placeholder="john@company.com" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-colors text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="project-type" class="block text-xs font-semibold text-gray-300 mb-2">Project Type</label>
+                            <select id="project-type" name="project_type" class="w-full px-4 py-3 rounded-xl bg-[#12141d] border border-white/10 text-white focus:outline-none focus:border-cyan-400 transition-colors text-sm">
+                                <option>Custom 3D Theme Build</option>
+                                <option>WooCommerce 3D Product Configurator</option>
+                                <option>WebGL Gutenberg Block Integration</option>
+                                <option>Existing Site WebGL Optimization</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="message" class="block text-xs font-semibold text-gray-300 mb-2">Project Scope & Details</label>
+                            <textarea id="message" name="message" rows="4" required placeholder="Describe your 3D project requirements..." class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-colors text-sm"></textarea>
+                        </div>
+
+                        <button type="submit" id="submit-btn" class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-500 text-white font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-cyan-500/20 flex items-center justify-center">
+                            <span>Send Project Inquiry</span> <i data-lucide="send" class="w-4 h-4 ml-2" aria-hidden="true"></i>
+                        </button>
+                    </form>
+
+                    <div id="form-success" class="hidden text-center py-8">
+                        <div class="w-12 h-12 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="check" class="w-6 h-6" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Inquiry Received Successfully!</h3>
+                        <p class="text-gray-400 text-sm">Thank you. Our 3D WebGL studio team will review your inquiry and reach out within 24 hours.</p>
+                    </div>
+
+                    <div id="form-error" class="hidden text-center py-4 text-red-400 text-sm">
+                        Submission failed. Please verify your Formspree endpoint configuration or try again later.
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="py-12 border-t border-white/5 text-gray-400 text-sm" role="contentinfo">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+            <div class="flex items-center space-x-2">
+                <span class="font-bold text-white">AETHER 3D</span>
+                <span>— WebGL Design System</span>
+            </div>
+            <div>
+                &copy; 2026 AETHER 3D Studio. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- THREE.JS & INTERACTION SCRIPTS -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Check for reduced motion preference
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // Mobile Menu Drawer Toggle
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', () => {
+                const expanded = menuBtn.getAttribute('aria-expanded') === 'true';
+                menuBtn.setAttribute('aria-expanded', !expanded);
+                mobileMenu.classList.toggle('hidden');
+            });
+            // Close menu on link click
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    menuBtn.setAttribute('aria-expanded', 'false');
+                });
+            });
+        }
+
+        // ----------------------------------------------------
+        // 1. HERO BACKGROUND THREE.JS SCENE
+        // ----------------------------------------------------
+        let heroScene, heroCamera, heroRenderer, heroParticles, heroMesh;
+
+        function initHero3D() {
+            const container = document.getElementById('hero-canvas-container');
+            if (!container) return;
+            
+            heroScene = new THREE.Scene();
+
+            heroCamera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            heroCamera.position.z = 5;
+
+            heroRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
+            heroRenderer.setSize(container.clientWidth, container.clientHeight);
+            heroRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(heroRenderer.domElement);
+
+            // Handle WebGL Context Loss
+            heroRenderer.domElement.addEventListener('webglcontextlost', (e) => {
+                e.preventDefault();
+                console.warn('Hero WebGL context lost.');
+            }, false);
+
+            // Particles Geometry
+            const particlesCount = prefersReducedMotion ? 300 : 1200;
+            const posArray = new Float32Array(particlesCount * 3);
+            for(let i=0; i<particlesCount*3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 12;
+            }
+            const particlesGeo = new THREE.BufferGeometry();
+            particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+            const particlesMat = new THREE.PointsMaterial({
+                size: 0.025,
+                color: 0x00f0ff,
+                transparent: true,
+                opacity: 0.7
+            });
+            heroParticles = new THREE.Points(particlesGeo, particlesMat);
+            heroScene.add(heroParticles);
+
+            // Center Glowing Wireframe Object
+            const geo = new THREE.IcosahedronGeometry(2, 2);
+            const mat = new THREE.MeshBasicMaterial({
+                color: 0x6366f1,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.35
+            });
+            heroMesh = new THREE.Mesh(geo, mat);
+            heroScene.add(heroMesh);
+
+            // Mouse parallax movement
+            let mouseX = 0, mouseY = 0;
+            document.addEventListener('mousemove', (e) => {
+                if (prefersReducedMotion) return;
+                mouseX = (e.clientX / window.innerWidth - 0.5) * 0.5;
+                mouseY = (e.clientY / window.innerHeight - 0.5) * 0.5;
+            });
+
+            // Hero Animation Loop with Intersection Observer Optimization
+            let heroVisible = true;
+            const heroObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    heroVisible = entry.isIntersecting;
+                });
+            }, { threshold: 0.05 });
+            heroObserver.observe(container);
+
+            function animateHero() {
+                requestAnimationFrame(animateHero);
+                if (!heroVisible) return;
+
+                if (!prefersReducedMotion) {
+                    heroMesh.rotation.x += 0.003;
+                    heroMesh.rotation.y += 0.005;
+                    heroParticles.rotation.y += 0.001;
+
+                    heroCamera.position.x += (mouseX - heroCamera.position.x) * 0.05;
+                    heroCamera.position.y += (-mouseY - heroCamera.position.y) * 0.05;
+                    heroCamera.lookAt(heroScene.position);
+                }
+
+                heroRenderer.render(heroScene, heroCamera);
+            }
+            animateHero();
+        }
+
+        // ----------------------------------------------------
+        // 2. STUDIO CONFIGURATOR THREE.JS SCENE
+        // ----------------------------------------------------
+        let studioScene, studioCamera, studioRenderer, studioControls, studioMesh, studioLight;
+        let currentGeo = 'torus', currentMat = 'glass', rotationSpeed = 1.5;
+
+        function initStudio3D() {
+            const container = document.getElementById('studio-canvas-container');
+            if (!container) return;
+
+            studioScene = new THREE.Scene();
+
+            studioCamera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+            studioCamera.position.set(0, 0, 5);
+
+            studioRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
+            studioRenderer.setSize(container.clientWidth, container.clientHeight);
+            studioRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(studioRenderer.domElement);
+
+            // Handle WebGL Context Loss
+            studioRenderer.domElement.addEventListener('webglcontextlost', (e) => {
+                e.preventDefault();
+                console.warn('Studio WebGL context lost.');
+            }, false);
+
+            // Controls
+            studioControls = new THREE.OrbitControls(studioCamera, studioRenderer.domElement);
+            studioControls.enableDamping = true;
+            studioControls.dampingFactor = 0.05;
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            studioScene.add(ambientLight);
+
+            studioLight = new THREE.PointLight(0x00f0ff, 2, 50);
+            studioLight.position.set(5, 5, 5);
+            studioScene.add(studioLight);
+
+            const studioLight2 = new THREE.PointLight(0x6366f1, 1.5, 50);
+            studioLight2.position.set(-5, -5, -5);
+            studioScene.add(studioLight2);
+
+            // Create Initial Mesh
+            updateStudioMesh();
+
+            // Studio Animation Loop with Intersection Observer
+            let studioVisible = true;
+            const studioObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    studioVisible = entry.isIntersecting;
+                });
+            }, { threshold: 0.1 });
+            studioObserver.observe(container);
+
+            function animateStudio() {
+                requestAnimationFrame(animateStudio);
+                if (!studioVisible) return;
+
+                if (studioMesh && !prefersReducedMotion) {
+                    studioMesh.rotation.x += 0.005 * rotationSpeed;
+                    studioMesh.rotation.y += 0.008 * rotationSpeed;
+                }
+                studioControls.update();
+                studioRenderer.render(studioScene, studioCamera);
+            }
+            animateStudio();
+        }
+
+        function createGeometry(type) {
+            switch(type) {
+                case 'torus': return new THREE.TorusKnotGeometry(1, 0.35, 128, 32);
+                case 'sphere': return new THREE.IcosahedronGeometry(1.5, 3);
+                case 'cube': return new THREE.BoxGeometry(1.8, 1.8, 1.8);
+                case 'dodeca': return new THREE.DodecahedronGeometry(1.5);
+                default: return new THREE.TorusKnotGeometry(1, 0.35, 128, 32);
+            }
+        }
+
+        function createMaterial(type) {
+            switch(type) {
+                case 'glass':
+                    return new THREE.MeshPhysicalMaterial({
+                        color: 0xffffff,
+                        roughness: 0.1,
+                        transmission: 0.9,
+                        thickness: 1.2,
+                        transparent: true,
+                        opacity: 0.85
+                    });
+                case 'wireframe':
+                    return new THREE.MeshBasicMaterial({
+                        color: 0x00f0ff,
+                        wireframe: true
+                    });
+                case 'hologram':
+                    return new THREE.MeshNormalMaterial({
+                        wireframe: false
+                    });
+                case 'metallic':
+                    return new THREE.MeshStandardMaterial({
+                        color: 0x818cf8,
+                        metalness: 0.9,
+                        roughness: 0.2
+                    });
+                default:
+                    return new THREE.MeshStandardMaterial({ color: 0x00f0ff });
+            }
+        }
+
+        function updateStudioMesh() {
+            if (studioMesh) {
+                // Dispose geometry and material to prevent GPU memory leaks
+                if (studioMesh.geometry) studioMesh.geometry.dispose();
+                if (studioMesh.material) {
+                    if (Array.isArray(studioMesh.material)) {
+                        studioMesh.material.forEach(mat => mat.dispose());
+                    } else {
+                        studioMesh.material.dispose();
+                    }
+                }
+                studioScene.remove(studioMesh);
+            }
+            const geo = createGeometry(currentGeo);
+            const mat = createMaterial(currentMat);
+            studioMesh = new THREE.Mesh(geo, mat);
+            studioScene.add(studioMesh);
+        }
+
+        function changeGeometry(type) {
+            currentGeo = type;
+            document.querySelectorAll('.geo-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-600', 'text-white');
+                btn.classList.add('bg-white/5', 'text-gray-300');
+            });
+            event.target.classList.remove('bg-white/5', 'text-gray-300');
+            event.target.classList.add('bg-brand-600', 'text-white');
+            updateStudioMesh();
+        }
+
+        function changeMaterial(type) {
+            currentMat = type;
+            document.querySelectorAll('.mat-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-600', 'text-white');
+                btn.classList.add('bg-white/5', 'text-gray-300');
+            });
+            event.target.classList.remove('bg-white/5', 'text-gray-300');
+            event.target.classList.add('bg-brand-600', 'text-white');
+            updateStudioMesh();
+        }
+
+        function setLightColor(colorHex) {
+            if (studioLight) studioLight.color.set(colorHex);
+        }
+
+        function resetStudioCamera() {
+            if (studioCamera && studioControls) {
+                studioCamera.position.set(0, 0, 5);
+                studioControls.reset();
+            }
+        }
+
+        // Speed Slider Event
+        const speedSlider = document.getElementById('speed-slider');
+        if (speedSlider) {
+            speedSlider.addEventListener('input', (e) => {
+                rotationSpeed = parseFloat(e.target.value);
+                const speedVal = document.getElementById('speed-val');
+                if (speedVal) speedVal.innerText = rotationSpeed + 'x';
+            });
+        }
+
+        // ----------------------------------------------------
+        // 3. FORM SUBMISSION HANDLING (Formspree Integration)
+        // ----------------------------------------------------
+        const contactForm = document.getElementById('contact-form');
+        if (contactForm) {
+            contactForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const submitBtn = document.getElementById('submit-btn');
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<span>Sending...</span>`;
+
+                try {
+                    const formData = new FormData(contactForm);
+                    const response = await fetch(contactForm.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        contactForm.classList.add('hidden');
+                        document.getElementById('form-success').classList.remove('hidden');
+                    } else {
+                        throw new Error('Form submission failed');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    document.getElementById('form-error').classList.remove('hidden');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            });
+        }
+
+        // ----------------------------------------------------
+        // 4. ROBUST RESIZE OBSERVER
+        // ----------------------------------------------------
+        window.addEventListener('DOMContentLoaded', () => {
+            initHero3D();
+            initStudio3D();
+
+            // Observe Hero container resize
+            const heroContainer = document.getElementById('hero-canvas-container');
+            if (heroContainer && window.ResizeObserver) {
+                const heroResizeObserver = new ResizeObserver(entries => {
+                    for (let entry of entries) {
+                        const { width, height } = entry.contentRect;
+                        if (heroCamera && heroRenderer && width > 0 && height > 0) {
+                            heroCamera.aspect = width / height;
+                            heroCamera.updateProjectionMatrix();
+                            heroRenderer.setSize(width, height);
+                        }
+                    }
+                });
+                heroResizeObserver.observe(heroContainer);
+            }
+
+            // Observe Studio container resize
+            const studioContainer = document.getElementById('studio-canvas-container');
+            if (studioContainer && window.ResizeObserver) {
+                const studioResizeObserver = new ResizeObserver(entries => {
+                    for (let entry of entries) {
+                        const { width, height } = entry.contentRect;
+                        if (studioCamera && studioRenderer && width > 0 && height > 0) {
+                            studioCamera.aspect = width / height;
+                            studioCamera.updateProjectionMatrix();
+                            studioRenderer.setSize(width, height);
+                        }
+                    }
+                });
+                studioResizeObserver.observe(studioContainer);
+            }
+        });
+    </script>
+</body>
+</html>
